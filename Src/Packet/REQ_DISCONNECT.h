@@ -15,7 +15,7 @@ public:
 		m_tSize = (int)strDiscon.size() * (int)sizeof(wchar_t);
 	};
 	~REQ_DISCONNECT() {};
-	void onRecv();
+	void onRecv(PACKET_HEADER packet);
 
 };
 #pragma pack(pop)

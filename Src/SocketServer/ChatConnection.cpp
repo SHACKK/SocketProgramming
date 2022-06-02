@@ -44,7 +44,7 @@ void CChatConnection::onRecv()
 	case 1:
 	{
 		REQ_CONNECT pckConnect;
-		Recv(&pckConnect, (pckConnect.GetBodySize() + 12));
+		__super::Recv(&pckConnect, (pckConnect.GetBodySize() + 12));
 		pckConnect.onRecv();
 
 		break;
