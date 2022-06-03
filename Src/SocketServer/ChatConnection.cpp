@@ -3,105 +3,34 @@
 
 void CChatConnection::onConnect()
 {
-	std::wstring strConnectedMessage = L"Accept";
-	Send(strConnectedMessage);
-	RES_ACCEPT pckAccept;
-	pckAccept.
 
-	strUserName = Recv();
-	if (strUserName.empty())
-	{
-		strUserName = L"[대기 손님]";
-		Send(CONNECTION_CLOSE_BY_CLIENT);
-		return;
-	}
-
-	m_pServer->UpdateChatData(L"---------------" + strUserName + L" 님이 입장하셨습니다" + L"---------------");
-	m_pServer->InsertConnectedSet(this);
-
-	// 최초 채팅데이터 전송
-	std::vector<std::wstring> vecChatData = m_pServer->GetChatData();
-	SendChatData(vecChatData);
 }
 
-void CChatConnection::onRecv()
+void CChatConnection::onRecv(E_PACKET ePacketType)
 {
-	//while (true)
-	//{
-	//	std::wstring strMessage = Recv();
-	//	if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_CLIENT) || strMessage.empty()) 
-	//		break;
-
-	//	m_pServer->UpdateChatData(GetCurrentTimeString() + strUserName + L" : " + strMessage);
-	//}
-
-	PACKET_HEADER packet;
-	__super::Peek(&packet);
-	int nPacketType = packet.GetPacketType();
-
-	switch (nPacketType)
+	switch (ePacketType)
 	{
-	case 1:
+	case E_PACKET::REQ_CONNECT:
 	{
 		REQ_CONNECT pckConnect;
-		__super::Recv(&pckConnect, (pckConnect.GetBodySize() + 12));
-		pckConnect.onRecv();
+		Recv(&pckConnect, (pckConnect.GetBodySize() + 12));
+		pckConnect.onRecv(pckConnect, this);
 
 		break;
 	}
-	case 2:
-	{
-		RES_ACCEPT pckAccept;
-		Recv(&pckAccept, (pckAccept.GetBodySize() + 12));
-		pckAccept.onRecv();
-
-		break;
-	}
-	case 3:
-	{
-		RES_WAIT pckWait;
-		Recv(&pckWait, (pckWait.GetBodySize() + 12));
-		pckWait.onRecv();
-
-		break;
-	}
-	case 4:
+	case E_PACKET::REQ_MESSAGEINPUT:
 	{
 		REQ_MESSAGEINPUT pckMessageInput;
 		Recv(&pckMessageInput, (pckMessageInput.GetBodySize() + 12));
-		pckMessageInput.onRecv();
+		pckMessageInput.onRecv(pckMessageInput, this);
 
 		break;
 	}
-	case 5:
-	{
-		RES_CHATDATA pckChatData;
-		Recv(&pckChatData, (pckChatData.GetBodySize() + 12));
-		pckChatData.onRecv();
-
-		break;
-	}
-	case 6:
+	case E_PACKET::REQ_DISCONNECT:
 	{
 		REQ_DISCONNECT pckDisconnect;
 		Recv(&pckDisconnect, (pckDisconnect.GetBodySize() + 12));
-		pckDisconnect.onRecv();
-
-		break;
-	}
-	case 7:
-	{
-		BROADCAST_MESSAGE pckMessage;
-		Recv(&pckMessage, (pckMessage.GetBodySize() + 12));
-		pckMessage.onRecv();
-
-		break;
-	}
-	case 8:
-	{
-		BROADCAST_DISCONNECT pckDisconnect;
-		Recv(&pckDisconnect, (pckDisconnect.GetBodySize() + 12));
-		pckDisconnect.onRecv();
+		pckDisconnect.onRecv(pckDisconnect, this);
 
 		break;
 	}
@@ -110,49 +39,8 @@ void CChatConnection::onRecv()
 
 void CChatConnection::onClose()
 {
-	Send(CONNECTION_CLOSE_BY_SERVER);
-	m_pServer->DisConnect(this);
 
-	if (!strUserName.empty())
-		m_pServer->UpdateChatData(L"---------------" + strUserName + L" 님이 퇴장하셨습니다" + L"---------------");
 }
-
-//std::wstring CChatConnection::Recv()
-//{
-//	try
-//	{
-//		size_t nLength = 0;
-//		int nRecved = ::recv(m_ConnectionSocket, (char*)&nLength, (int)sizeof(nLength), 0);
-//
-//		std::wstring strMsg;
-//		strMsg.resize(nLength / sizeof(wchar_t));
-//		::recv(m_ConnectionSocket, (char*)strMsg.c_str(), (int)nLength, 0);
-//
-//		return strMsg;
-//	}
-//	catch (...)
-//	{
-//		printf("[Recv Error] : %d\n", WSAGetLastError());
-//	}
-//}
-//
-//int CChatConnection::Send(std::wstring strMessage)
-//{
-//	int nRet = 0;
-//	try
-//	{
-//		size_t nLength = strMessage.length() * sizeof(wchar_t);
-//		nRet += ::send(m_ConnectionSocket, (const char*)&nLength, sizeof(nLength), 0);
-//		nRet += ::send(m_ConnectionSocket, (const char*)strMessage.c_str(), (int)nLength, 0);
-//
-//		return nRet;
-//	}
-//	catch (...)
-//	{
-//		printf("[Send Error] : %d\n", WSAGetLastError());
-//		return 0;
-//	}
-//}
 
 int CChatConnection::SendChatData(std::vector<std::wstring> vecChatData)
 {
@@ -182,18 +70,13 @@ std::wstring CChatConnection::GetCurrentTimeString()
 	return strRet;
 }
 
-int CConnectionSuper::Send(PACKET_HEADER* packet)
+void CChatConnection::SetUserName(std::wstring strUserName)
 {
-	int nLength = packet->GetBodySize() + 12;
-	return ::send(m_ConnectionSocket, (const char*)&packet, nLength, 0);
+	m_strUserName = strUserName;
 }
 
-int CConnectionSuper::Recv(PACKET_HEADER* packet, int nLength)
+std::wstring CChatConnection::GetName()
 {
-	return ::recv(m_ConnectionSocket, (char*)packet, nLength, 0);
+	return m_strUserName;
 }
 
-int CConnectionSuper::Peek(PACKET_HEADER* packet)
-{
-	return ::recv(m_ConnectionSocket, (char*)packet, 12, MSG_PEEK);
-}

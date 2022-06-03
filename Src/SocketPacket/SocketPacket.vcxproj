@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,33 +21,32 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{5366e04f-09be-423f-a05f-e0e767ac5660}</ProjectGuid>
-    <RootNamespace>MessagePacket</RootNamespace>
+    <ProjectGuid>{712ab423-f333-42f0-b328-f4699ffec125}</ProjectGuid>
+    <RootNamespace>SocketPacket</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Packet</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -156,28 +155,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BROADCAST_DISCONNECT.h" />
-    <ClInclude Include="BROADCAST_MESSAGE.h" />
-    <ClInclude Include="REQ_DISCONNECT.h" />
-    <ClInclude Include="REQ_MESSAGEINPUT.h" />
-    <ClInclude Include="RES_ACCEPT.h" />
-    <ClInclude Include="REQ_CONNECT.h" />
+    <ClInclude Include="packet.h" />
+    <ClInclude Include="PacketHandler.h" />
+    <ClInclude Include="PacketHandlerSuper.h" />
+    <ClInclude Include="Packetizer.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="RES_CHATDATA.h" />
-    <ClInclude Include="RES_WAIT.h" />
-    <ClInclude Include="_Packet.h" />
-    <ClInclude Include="PACKET_HEADER.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BROADCAST_DISCONNECT.cpp" />
-    <ClCompile Include="BROADCAST_MESSAGE.cpp" />
-    <ClCompile Include="REQ_DISCONNECT.cpp" />
-    <ClCompile Include="REQ_MESSAGEINPUT.cpp" />
-    <ClCompile Include="RES_ACCEPT.cpp" />
-    <ClCompile Include="REQ_CONNECT.cpp" />
-    <ClCompile Include="PACKET_HEADER.cpp" />
-    <ClCompile Include="RES_CHATDATA.cpp" />
-    <ClCompile Include="RES_WAIT.cpp" />
+    <ClCompile Include="PacketHandler.cpp" />
+    <ClCompile Include="PacketHandlerSuper.cpp" />
+    <ClCompile Include="Packetizer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

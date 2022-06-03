@@ -7,17 +7,15 @@
 class CChatConnection : public CConnectionSuper
 {
 private:
-	std::wstring strUserName;
+	std::wstring m_strUserName;
 public:
 	void onConnect();
-	void onRecv();
+	void onRecv(E_PACKET ePacketType);
 	void onClose();
 	//std::wstring Recv();
 	//int Send(std::wstring strMessage);
 	int SendChatData(std::vector<std::wstring> vecChatData);
 	std::wstring GetCurrentTimeString();
-
-	int Send(PACKET_HEADER* packet);
-	int Recv(PACKET_HEADER* packet, int nLength);
-	int Peek(PACKET_HEADER* packet);
+	void SetUserName(std::wstring strUserName);
+	std::wstring GetName();
 };

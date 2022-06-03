@@ -9,16 +9,18 @@ DWORD WINAPI ConnectionThreadCaller(void* pContext)
 
 DWORD CConnectionSuper::ConnectionThread()
 {
-	onConnect();
 	PACKET_HEADER packet;
 	
+	onConnect();
 	while (true)
 	{
-		// Peek 후 Type이 Discconect이면 break;
-		onRecv();
+		Peek(&packet);
+		if (!packet.MagicOK() || packet.GetPacketType() == E_PACKET::REQ_DISCONNECT)
+			break;
+
+		onRecv(packet.GetPacketType());
 	}
 	onClose();
-	//::closesocket(m_ConnectionSocket);
 
 	return 0;
 }
@@ -32,19 +34,24 @@ int CConnectionSuper::Establish(SOCKET acceptedSocket, CServer* pServer)
 	return 0;
 }
 
-int CConnectionSuper::Send(LPCBYTE pData, size_t tSize)
+int CConnectionSuper::Send(PACKET_HEADER* packet)
 {
-	return ::send(m_ConnectionSocket, (const char*)pData, (int)tSize, 0);
+	return ::send(m_ConnectionSocket, (const char*)&packet, (int)sizeof(packet), 0);
 }
 
-int CConnectionSuper::Recv(LPBYTE pBuffer, size_t tBufferSize)
+int CConnectionSuper::Recv(PACKET_HEADER* packet, int nLength)
 {
-	return ::recv(m_ConnectionSocket, (char*)pBuffer, (int)tBufferSize, 0);
+	return ::recv(m_ConnectionSocket, (char*)packet, nLength, 0);
 }
 
-int CConnectionSuper::Peek(LPBYTE pBuffer, size_t tBufferSize)
+int CConnectionSuper::Peek(PACKET_HEADER* packet)
 {
-	return ::recv(m_ConnectionSocket, (char*)&pBuffer, (int)tBufferSize, MSG_PEEK);
+	return ::recv(m_ConnectionSocket, (char*)packet, 12, MSG_PEEK);
+}
+
+CServer* CConnectionSuper::GetServer()
+{
+	return m_pServer;
 }
 
 void CConnectionSuper::SetSocket(SOCKET socket, CServer* server)

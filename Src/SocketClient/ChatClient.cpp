@@ -1,46 +1,92 @@
 #include "pch.h"
 #include "ChatClient.h"
 
+DWORD CChatClient::ConnectedThread()
+{
+	while (true)
+	{
+		PACKET_HEADER packet;
+		Peek(&packet, (int)sizeof(PACKET_HEADER));
+		E_PACKET ePacketType = packet.GetPacketType();
+
+		switch (ePacketType)
+		{
+		case E_PACKET::RES_ACCEPT:
+		{
+			RES_ACCEPT pckAccept;
+			Recv(&pckAccept, (int)sizeof(RES_ACCEPT));
+			pckAccept.onRecv(pckAccept);
+		}
+		case E_PACKET::RES_CHATDATA:
+		{
+			RES_CHATDATA pckChatData;
+			Recv(&pckChatData, (int)sizeof(RES_CHATDATA));
+			pckChatData.onRecv(pckChatData);
+		}
+		case E_PACKET::BROADCAST_MESSAGE:
+		{
+			BROADCAST_MESSAGE pckMessage;
+			Recv(&pckMessage, (int)sizeof(BROADCAST_MESSAGE));
+			pckMessage.onRecv(pckMessage);
+		}
+		case E_PACKET::BROADCAST_DISCONNECT:
+		{
+			BROADCAST_DISCONNECT pckDisconnect;
+			Recv(&pckDisconnect, (int)sizeof(pckDisconnect));
+			pckDisconnect.onRecv(pckDisconnect);
+		}
+		}
+		std::wstring strMessage = client.Recv();
+
+		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_SERVER) || strMessage.empty())
+		{
+			client.Close();
+			break;
+		}
+
+		vecChatData.push_back(strMessage);
+		PrintChatData();
+	}
+	return 0;
+}
+
+DWORD WINAPI ConnectedThreadCaller(LPVOID pContext)
+{
+	CChatClient* client = (CChatClient*)pContext;
+	return client->ConnectedThread();
+}
+
 bool CChatClient::Connect(ST_SERVER_INFO stServerInfo, std::wstring strUserName)
 {
 	__super::Connect(stServerInfo);
+	REQ_CONNECT pckConnect;
+	pckConnect.m_strUserName = m_strUserName;
+	this->Send(&pckConnect);
 
-	std::wstring strConnectResult = Recv();
-	if (!wcscmp(strConnectResult.c_str(), L"Wait"))
-	{
-		wprintf(L"Server is too busy...\nPlease Wait");
-		strConnectResult = Recv();
-	}
-	if (!wcscmp(strConnectResult.c_str(), L"Accept"))
-	{
-		wprintf(L"Connected!\n");
-		m_strUserName = strUserName;
-		Send(m_strUserName);
-		return true;
-	}
+	PACKET_HEADER packet;
+	::recv(m_hClientSocket, (char*)&packet, (int)sizeof(packet), MSG_PEEK);
+	if (!packet.MagicOK() || packet.GetPacketType() != E_PACKET::RES_ACCEPT)
+		return false;
 
-	return false;
+	RES_ACCEPT pckAccept;
+	this->Recv(&pckAccept, sizeof(RES_ACCEPT));
+	HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, ConnectedThreadCaller, this, 0, nullptr);
+	return true;
 }
 
-int CChatClient::Send(std::wstring strMessage)
+int CChatClient::Send(PACKET_HEADER* packet)
 {
-	int nRet = 0;
-	size_t nLength = strMessage.length() * sizeof(wchar_t);
-	nRet += ::send(m_hClientSocket, (const char*)&nLength, sizeof(nLength), 0);
-	nRet += ::send(m_hClientSocket, (const char*)strMessage.c_str(), (int)nLength, 0);
-	return nRet;
+	return ::send(m_hClientSocket, (const char*)&packet, sizeof(packet), 0);
 }
 
-std::wstring CChatClient::Recv()
+int CChatClient::Recv(PACKET_HEADER* packet, int nLength)
 {
-	size_t nLength = 0;
-	::recv(m_hClientSocket, (char*)&nLength, sizeof(nLength), 0);
+	return ::recv(m_hClientSocket, (char*)packet, nLength, 0);
+}
 
-	std::wstring strRet;
-	strRet.resize(nLength / sizeof(wchar_t));
-	::recv(m_hClientSocket, (char*)strRet.c_str(), (int)nLength, 0);
-
-	return strRet;
+int CChatClient::Peek(PACKET_HEADER* packet, int nLength)
+{
+	return ::recv(m_hClientSocket, (char*)&packet, nLength, MSG_PEEK);
 }
 
 std::vector<std::wstring> CChatClient::RecvChatData()

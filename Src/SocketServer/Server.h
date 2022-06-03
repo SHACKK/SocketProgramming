@@ -21,7 +21,6 @@ class CServer
 private:
 	std::vector<CConnectionSuper*> m_vecConnectionInstance;
 	std::queue<CConnectionSuper*> m_queReady;
-	std::queue<SOCKET> m_queSuspended;
 	std::set<CConnectionSuper*> m_setConnected;
 	std::queue<CConnectionSuper*> m_queDiscon;
 	SOCKET m_ListenSocket = 0;
@@ -34,7 +33,6 @@ private:
 	};
 
 	std::mutex mtx_queReady;
-	std::mutex mtx_queSuspended;
 	std::mutex mtx_setConnected;
 	std::mutex mtx_queDiscon;
 	std::mutex mtx_ChatData;
@@ -48,8 +46,8 @@ public:
 	};
 	~CServer()
 	{
-		std::wstring strShutdownCommand = L"/CloseByServer";
-		Broadcast(strShutdownCommand);
+		//std::wstring strShutdownCommand = L"/CloseByServer";
+		//Broadcast(strShutdownCommand);
 
 	};
 	DWORD AcceptThread();
@@ -57,14 +55,8 @@ public:
 	int StartUp(ST_SERVER_INIT stInit);
 	void ShutDown();
 	void DisConnect(CConnectionSuper* pConnection);
-	void Broadcast(std::wstring strMessage);
+	void Broadcast(PACKET_HEADER* packet);
 	void InsertConnectedSet(CConnectionSuper* newConnection);
 	std::vector<std::wstring> GetChatData();
 	bool UpdateChatData(std::wstring strMessage);
-	
-	//Test¿ë
-	SOCKET GetListenSocket();
-	void MakeConnectionPool(std::vector<CConnectionSuper*> vecConnectionPool);
-	DWORD TestAcceptThread();
-	DWORD TestDisAcceptThread();
 };

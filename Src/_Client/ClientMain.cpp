@@ -35,11 +35,12 @@ void PrintChatData()
 	wprintf(L"\n¸Þ¼¼Áö >> %s", strCurrentText.c_str());
 }
 
-DWORD WINAPI UpdateChatDataThread(LPVOID pContext)
+DWORD WINAPI ConnectedThread(LPVOID pContext)
 {
 	while (true)
 	{
 		CChatClient& client = *(CChatClient*)pContext;
+
 		std::wstring strMessage = client.Recv();
 		
 		if (!wcscmp(strMessage.c_str(), CONNECTION_CLOSE_BY_SERVER) || strMessage.empty())
@@ -153,11 +154,18 @@ int main()
 		printf("Connection Failed\n");
 		return 1;
 	}
+	HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, ConnectedThread, &client, 0, nullptr);
+
 	vecChatData = client.RecvChatData();
 	PrintChatData();
-
-	HANDLE hUpdateChatDataThread = CreateThread(nullptr, 0, UpdateChatDataThread, &client, 0, nullptr);
+	
 	HANDLE hInputThread = CreateThread(nullptr, 0, KeyInputThread, &client, 0, nullptr);
+	
+	while (true)
+	{
+
+	}
+
 
 	WaitForSingleObject(hInputThread, INFINITE);
 	WaitForSingleObject(hUpdateChatDataThread, INFINITE);
