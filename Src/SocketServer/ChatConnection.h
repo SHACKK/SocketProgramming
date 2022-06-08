@@ -10,7 +10,7 @@ private:
 	std::wstring m_strUserName;
 public:
 	void onConnect();
-	void onRecv(E_PACKET ePacketType);
+	void onRecv();
 	void onClose();
 	//std::wstring Recv();
 	//int Send(std::wstring strMessage);

@@ -12,4 +12,4 @@
 #include <ctime>
 
 #include "Struct.h"
-#include "../Packet/_Packet.h"
+#include "../SocketPacket/_SocketPacket.h"

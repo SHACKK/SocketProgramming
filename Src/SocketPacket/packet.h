@@ -20,6 +20,7 @@ struct PACKET_HEADER
 	const E_PACKET_TYPE m_eType;
 	const int m_nSize;
 
+	PACKET_HEADER(void);
 	PACKET_HEADER(E_PACKET_TYPE ePacketType, int nPacketSize)
 		: m_szMagic{ 'S', 'H', 'A', 'K' }
 		, m_eType(ePacketType)
@@ -38,6 +39,7 @@ struct REQ_CONNECT : public PACKET_HEADER
 
 struct RES_ACCEPT : public PACKET_HEADER
 {
+public:
 	char szAccept[8];
 	RES_ACCEPT(void)
 		: PACKET_HEADER(E_PACKET_TYPE::RES_ACCEPT, sizeof(*this)-sizeof(PACKET_HEADER))
