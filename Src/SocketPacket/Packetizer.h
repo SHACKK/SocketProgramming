@@ -2,7 +2,7 @@
 #include "PacketHandler.h"
 #include "../SocketServer/ConnectionSuper.h"
 
-class Packetizer : public CConnectionSuper
+class CPacketizer : public CConnectionSuper
 	, public CPacketHandler<REQ_CONNECT>
 	, public CPacketHandler<RES_ACCEPT>
 	, public CPacketHandler<REQ_MESSAGE_INPUT>

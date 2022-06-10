@@ -14,10 +14,7 @@ protected:
 	virtual void onClose() = 0;
 
 public:
-	CConnectionSuper()
-	{
-
-	}
+	CConnectionSuper() {}
 	~CConnectionSuper() {}
 
 	DWORD ConnectionThread();
