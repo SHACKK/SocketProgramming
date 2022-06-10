@@ -6,4 +6,4 @@
 #include <vector>
 #include <string>
 
-#include "../Packet/_Packet.h"
+#include "../SocketPacket/_SocketPacket.h"

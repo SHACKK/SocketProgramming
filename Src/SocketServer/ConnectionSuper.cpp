@@ -11,17 +11,11 @@ DWORD WINAPI ConnectionThreadCaller(void* pContext)
 DWORD CConnectionSuper::ConnectionThread()
 {
 	PACKET_HEADER packet;
-	
-	onConnect();
-	while (true)
+	do
 	{
 		Peek(&packet);
-		if (!packet.MagicOK() || packet.GetPacketType() == E_PACKET::REQ_DISCONNECT)
-			break;
-
-		onRecv(packet.GetPacketType());
-	}
-	onClose();
+		onRecv();
+	} while (true);
 
 	return 0;
 }

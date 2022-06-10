@@ -6,35 +6,9 @@ void CChatConnection::onConnect()
 
 }
 
-void CChatConnection::onRecv(E_PACKET ePacketType)
+void CChatConnection::onRecv()
 {
-	switch (ePacketType)
-	{
-	case E_PACKET::REQ_CONNECT:
-	{
-		REQ_CONNECT pckConnect;
-		Recv(&pckConnect, (pckConnect.GetBodySize() + 12));
-		pckConnect.onRecv(pckConnect, this);
 
-		break;
-	}
-	case E_PACKET::REQ_MESSAGEINPUT:
-	{
-		REQ_MESSAGEINPUT pckMessageInput;
-		Recv(&pckMessageInput, (pckMessageInput.GetBodySize() + 12));
-		pckMessageInput.onRecv(pckMessageInput, this);
-
-		break;
-	}
-	case E_PACKET::REQ_DISCONNECT:
-	{
-		REQ_DISCONNECT pckDisconnect;
-		Recv(&pckDisconnect, (pckDisconnect.GetBodySize() + 12));
-		pckDisconnect.onRecv(pckDisconnect, this);
-
-		break;
-	}
-	}
 }
 
 void CChatConnection::onClose()

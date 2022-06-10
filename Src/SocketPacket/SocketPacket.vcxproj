@@ -160,6 +160,7 @@
     <ClInclude Include="PacketHandlerSuper.h" />
     <ClInclude Include="Packetizer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="_SocketPacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PacketHandler.cpp" />

@@ -52,8 +52,7 @@ int CServer::StartUp(ST_SERVER_INIT stInit)
 
 void CServer::ShutDown()
 {
-	BROADCAST_DISCONNECT pckDisconnect;
-	pckDisconnect.strDiscon = L"@DisconDisconDiscon@";
+	REQ_DISCONNECT pckDisconnect;
 	Broadcast(&pckDisconnect);
 	WaitForSingleObject(hAcceptThread, INFINITE);
 	WaitForSingleObject(hDisAcceptThread, INFINITE);
@@ -89,11 +88,9 @@ bool CServer::UpdateChatData(std::wstring strMessage)
 		m_vecChatData.erase(m_vecChatData.begin());
 	m_vecChatData.push_back(strMessage);
 
-	BROADCAST_MESSAGE pckMessage;
-	pckMessage.strMessage = strMessage;
+	REQ_DISCONNECT pckMessage;
 	Broadcast(&pckMessage);
 
-	// Broadcast 과정에서 순서가 뒤바뀔 수도 있으므로 이 행위를 포함하여 mutex처리를 해줬다.
 	mtx_ChatData.unlock();	
 
 	return true;
