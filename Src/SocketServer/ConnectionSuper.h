@@ -9,8 +9,9 @@ protected:
 	SOCKET m_ConnectionSocket;
 	CServer* m_pServer;
 	virtual void onConnect() = 0;
-	virtual void onRecv(E_PACKET ePacketType) = 0;
+	virtual void onRecv(E_PACKET_TYPE ePacketType) = 0;
 	virtual void onClose() = 0;
+	std::vector<CPacketHandlerSuper*> m_vecHandler;
 
 public:
 	DWORD ConnectionThread();

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ConnectionSuper.h"
+#include "../SocketPacket/_SocketPacket.h"
 
 DWORD WINAPI ConnectionThreadCaller(void* pContext)
 {

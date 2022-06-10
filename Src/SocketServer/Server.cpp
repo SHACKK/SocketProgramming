@@ -2,6 +2,7 @@
 #include "Server.h"
 #include "ConnectionSuper.h"
 #include "ChatConnection.h"
+#include "../SocketPacket/_SocketPacket.h"
 
 DWORD WINAPI AcceptThreadCaller(void* pContext)
 {
